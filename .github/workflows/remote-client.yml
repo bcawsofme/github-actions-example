@@ -34,7 +34,7 @@ jobs:
       shell: pwsh
       id: variables
       run: |
-        $version = "0.0.0.${{ github.run_number }}"
+        $version = '0.0.0.${{ github.run_number }}'
         $isProd = '${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]' -or '${{ github.event.inputs.production }}' -eq 'true'
         if ($isProd) {
           $assemblyName = 'Avanti Cloud Client'
