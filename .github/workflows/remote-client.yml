@@ -1,0 +1,119 @@
+name: Build and Release - Remote Client
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v[0-9].[0-9].[0-9].[0-9]
+  workflow_dispatch:
+    inputs:
+      production:
+        type: boolean
+        description: 'Deploy to production?'
+      ref:
+        description: 'The branch, tag, or SHA to deploy. Must be a tag if deploying to prod'
+        required: false
+
+env:
+  DOTNET_VERSION: '6.0'
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: windows-latest
+    outputs:
+      VERSION: ${{ steps.variables.outputs.VERSION }}
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.inputs.ref }}
+
+    - name: Set variables
+      shell: pwsh
+      id: variables
+      run: |
+        $run = ${{ github.run_number }}
+        $isProd = '${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]' -or '${{ github.event.inputs.production }}' -eq 'true'
+        if ($isProd) {
+          $assemblyName = 'Avanti Cloud Client'
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            if ('${{ github.event.inputs.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]' -eq $false) {
+              Write-Error "Deployment to production can only be done against a tag"
+              return
+            }
+            $version = '${{ github.event.inputs.ref }}'.Split('/')[-1].TrimStart('v')
+          } else {
+            $version = '${{ github.ref }}'.Split('/')[-1].TrimStart('v')
+          }
+          $minversion = '${{ secrets.MINVERSION_PROD }}'
+          $functionUrl = 'https://remoteservice.myavanti.ca/api'
+          $publishUrl = 'https://app.myavanti.ca'
+        } else {
+          $minversion = '${{ secrets.MINVERSION_NONPROD }}'
+          $assemblyName = 'Avanti Cloud Client Non-Prod'
+          $version = "0.0.0.$run"
+          $functionUrl = 'https://remoteservice.avantidemo.com/api'
+          $publishUrl = 'https://app.avantidemo.com'
+        }
+        echo "ASSEMBLY_NAME=$assemblyName" >>  $env:GITHUB_OUTPUT
+        echo "VERSION=$version" >>  $env:GITHUB_OUTPUT
+        echo "MINVERSION=$minversion" >>  $env:GITHUB_OUTPUT
+        echo "FUNCTION_URL=$functionUrl" >>  $env:GITHUB_OUTPUT
+        echo "PUBLISH_URL=$publishUrl" >>  $env:GITHUB_OUTPUT
+
+    - name: Show Variables
+      run: |
+        echo ${{ steps.variables.outputs.VERSION }}
+        echo ${{ steps.variables.outputs.ASSEMBLY_NAME }}
+        echo ${{ steps.variables.outputs.MINVERSION }}
+        echo ${{ steps.variables.outputs.FUNCTION_URL }}
+        echo ${{ steps.variables.outputs.PUBLISH_URL }}
+
+  deploy-non-production:
+    name: Deploy To Non-Production
+    if: "${{ github.event.inputs.production != 'true' && !startsWith(github.ref, 'refs/tags') }}"
+    runs-on: windows-latest
+    environment: non-production
+    needs: build
+    env:
+      STORAGE_ACCOUNT: 'avantinonprodclientapp'
+      STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+      AZURE_SERVICE_ACCOUNT_SECRET: 'AZURE_SERVICE_ACCOUNT'
+      AZURE_RESOURCE_GROUP: 'rg-AvantiRemote-app-storage-non-prod-canadacentral-001'
+      AZURE_CDN_ENDPOINT: 'avantinonprodclientapp'
+      AZURE_CDN_PROFILE_NAME: 'avanticlientapp'
+    steps:
+    - name: Show Variables
+      run: |
+        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ env.STORAGE_ACCOUNT }}
+        echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
+        echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
+        echo ${{ env.AZURE_CDN_ENDPOINT }}
+        echo ${{ env.AZURE_CDN_PROFILE_NAME }}
+        
+  deploy-production:
+    name: Deploy To Production
+    if: "${{ github.event.inputs.production == 'true' || startsWith(github.ref, 'refs/tags') }}"
+    runs-on: windows-latest
+    environment: production
+    needs: build
+    env:
+      STORAGE_ACCOUNT: 'avantichsclientapp'
+      STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY_PROD }}
+      AZURE_SERVICE_ACCOUNT_SECRET: 'AZURE_SERVICE_ACCOUNT_PROD'
+      AZURE_RESOURCE_GROUP: 'rg-AvantiRemote-app-storage-CHS-canadacentral-001'
+      AZURE_CDN_ENDPOINT: 'avanticlientapp'
+      AZURE_CDN_PROFILE_NAME: 'avanticlientapp'
+    steps:
+    - name: Show Variables
+      run: |
+        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ env.STORAGE_ACCOUNT }}
+        echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
+        echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
+        echo ${{ env.AZURE_CDN_ENDPOINT }}
+        echo ${{ env.AZURE_CDN_PROFILE_NAME }}
+    
