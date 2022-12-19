@@ -89,7 +89,6 @@ jobs:
       run: |
         echo ${{ needs.build.outputs.VERSION }}
         echo ${{ env.STORAGE_ACCOUNT }}
-        echo ${{ env.STORAGE_ACCOUNT_KEY }}
         echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
         echo ${{ env.AZURE_CDN_ENDPOINT }}
         echo ${{ env.AZURE_CDN_PROFILE_NAME }}
