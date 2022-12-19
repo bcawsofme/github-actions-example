@@ -54,8 +54,7 @@ jobs:
           if ('${{ github.event.inputs.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
             $version = '${{ github.event.inputs.ref }}'.Split('/')[-1].TrimStart('v')
           }
-          if ('${{ github.event.inputs.function_app_name }}' -eq 'functionapp-AvantiRemote-CHS-canadacentral-001' -or 
-          '${{ github.event.inputs.publish_profile }}' -eq 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD') {
+          if ($functionAppName -eq 'functionapp-AvantiRemote-CHS-canadacentral-001' -or $publishProfileName -eq 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD') {
             $isProd = $true
           }
         } elseif ('${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
