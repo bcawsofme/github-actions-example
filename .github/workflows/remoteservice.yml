@@ -101,5 +101,5 @@ jobs:
       run: |
         echo ${{ needs.build.outputs.VERSION }}
         echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
-        echo ${{ needs.build.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ needs.build.outputs.PUBLISH_PROFILE }}
         echo ${{ needs.build.outputs.IS_PROD }}
