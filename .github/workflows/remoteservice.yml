@@ -31,7 +31,7 @@ jobs:
     outputs:
       VERSION: ${{ steps.variables.outputs.VERSION }}
       FUNCTION_APP_NAME: ${{ steps.variables.outputs.FUNCTION_APP_NAME }}
-      PUBLISH_PROFILE: ${{ steps.variables.outputs.PUBLISH_PROFILE }}
+      PUBLISH_PROFILE_NAME: ${{ steps.variables.outputs.PUBLISH_PROFILE_NAME }}
       IS_PROD: ${{ steps.variables.outputs.IS_PROD }}
     steps:
     - name: 'Checkout GitHub Action'
@@ -45,35 +45,35 @@ jobs:
       run: |
         $version = "0.0.0.${{ github.run_number }}"
         $functionAppName = 'functionapp-AvantiRemote-non-prod-canadacentral-001'
-        $publishProfile = '${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}'
+        $publishProfileName = 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE'
         $isProd = $false
 
         if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
           $functionAppName = '${{ github.event.inputs.function_app_name }}'
-          $publishProfile = '${{ secrets[github.event.inputs.publish_profile] }}'
+          $publishProfileName = '${{ github.event.inputs.publish_profile }}'
           if ('${{ github.event.inputs.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
             $version = '${{ github.event.inputs.ref }}'.Split('/')[-1].TrimStart('v')
           }
           if ('${{ github.event.inputs.function_app_name }}' -eq 'functionapp-AvantiRemote-CHS-canadacentral-001' -or 
-          '${{ secrets[github.event.inputs.publish_profile] }}' -eq 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD') {
+          '${{ github.event.inputs.publish_profile }}' -eq 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD') {
             $isProd = $true
           }
         } elseif ('${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
           $isProd = $true
           $version = '${{ github.ref }}'.Split('/')[-1].TrimStart('v')
           $functionAppName = 'functionapp-AvantiRemote-CHS-canadacentral-001'
-          $publishProfile = '${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD }}'
+          $publishProfileName = 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD'
         }
         echo "VERSION=$version" >>  $env:GITHUB_OUTPUT
         echo "FUNCTION_APP_NAME=$functionAppName" >>  $env:GITHUB_OUTPUT
-        echo "PUBLISH_PROFILE=$publishProfile" >>  $env:GITHUB_OUTPUT
+        echo "PUBLISH_PROFILE_NAME=$publishProfileName" >>  $env:GITHUB_OUTPUT
         echo "IS_PROD=$isProd" >>  $env:GITHUB_OUTPUT
 
     - name: Show Variables
       run: |
         echo ${{ steps.variables.outputs.VERSION }}
         echo ${{ steps.variables.outputs.FUNCTION_APP_NAME }}
-        echo ${{ steps.variables.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ steps.variables.outputs.PUBLISH_PROFILE_NAME }}
         echo ${{ steps.variables.outputs.IS_PROD }}
 
   deploy-prod:
