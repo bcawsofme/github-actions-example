@@ -34,7 +34,7 @@ jobs:
       shell: pwsh
       id: variables
       run: |
-        $version = '0.0.0.${{ github.run_number }}'
+        $run = ${{ github.run_number }}
         $isProd = '${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]' -or '${{ github.event.inputs.production }}' -eq 'true'
         if ($isProd) {
           $assemblyName = 'Avanti Cloud Client'
@@ -53,6 +53,7 @@ jobs:
         } else {
           $minversion = '${{ secrets.MINVERSION_NONPROD }}'
           $assemblyName = 'Avanti Cloud Client Non-Prod'
+          $version = "0.0.0.$run"
           $functionUrl = 'https://remoteservice.avantidemo.com/api'
           $publishUrl = 'https://app.avantidemo.com'
         }
@@ -69,7 +70,7 @@ jobs:
         echo ${{ steps.variables.outputs.MINVERSION }} | sed 's/./& /g'
         echo ${{ steps.variables.outputs.FUNCTION_URL }}
         echo ${{ steps.variables.outputs.PUBLISH_URL }}
-
+        
   deploy-non-production:
     name: Deploy To Non-Production
     if: "${{ github.event.inputs.production != 'true' && !startsWith(github.ref, 'refs/tags') }}"
@@ -88,6 +89,7 @@ jobs:
       run: |
         echo ${{ needs.build.outputs.VERSION }}
         echo ${{ env.STORAGE_ACCOUNT }}
+        echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
         echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
         echo ${{ env.AZURE_CDN_ENDPOINT }}
         echo ${{ env.AZURE_CDN_PROFILE_NAME }}
@@ -108,9 +110,9 @@ jobs:
     steps:
     - name: Show Variables
       run: |
-        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ needs.build.outputs.VERSION }} | sed 's/./& /g'
         echo ${{ env.STORAGE_ACCOUNT }}
-        echo ${{ env.STORAGE_ACCOUNT_KEY }}
+        echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
         echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
         echo ${{ env.AZURE_CDN_ENDPOINT }}
         echo ${{ env.AZURE_CDN_PROFILE_NAME }}
