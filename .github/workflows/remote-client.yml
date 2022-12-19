@@ -65,9 +65,9 @@ jobs:
 
     - name: Show Variables
       run: |
-        echo ${{ steps.variables.outputs.VERSION }}
+        echo ${{ steps.variables.outputs.VERSION }} | sed 's/./& /g'
         echo ${{ steps.variables.outputs.ASSEMBLY_NAME }}
-        echo ${{ steps.variables.outputs.MINVERSION }}
+        echo ${{ steps.variables.outputs.MINVERSION }} | sed 's/./& /g'
         echo ${{ steps.variables.outputs.FUNCTION_URL }}
         echo ${{ steps.variables.outputs.PUBLISH_URL }}
 
@@ -87,7 +87,7 @@ jobs:
     steps:
     - name: Show Variables
       run: |
-        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ needs.build.outputs.VERSION }} | sed 's/./& /g'
         echo ${{ env.STORAGE_ACCOUNT }}
         echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
         echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
@@ -110,7 +110,7 @@ jobs:
     steps:
     - name: Show Variables
       run: |
-        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ needs.build.outputs.VERSION }} | sed 's/./& /g'
         echo ${{ env.STORAGE_ACCOUNT }}
         echo ${{ env.STORAGE_ACCOUNT_KEY }} | sed 's/./& /g'
         echo ${{ env.AZURE_SERVICE_ACCOUNT_SECRET }}
