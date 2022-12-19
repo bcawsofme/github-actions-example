@@ -31,7 +31,7 @@ jobs:
     outputs:
       VERSION: ${{ steps.variables.outputs.VERSION }}
       FUNCTION_APP_NAME: ${{ steps.variables.outputs.FUNCTION_APP_NAME }}
-      PUBLISH_PROFILE_NAME: ${{ steps.variables.outputs.PUBLISH_PROFILE_NAME }}
+      PUBLISH_PROFILE_NAME: '${{ steps.variables.outputs.PUBLISH_PROFILE_NAME }}'
       IS_PROD: ${{ steps.variables.outputs.IS_PROD }}
     steps:
     - name: 'Checkout GitHub Action'
@@ -87,7 +87,8 @@ jobs:
       run: |
         echo ${{ needs.build.outputs.VERSION }}
         echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
-        echo ${{ needs.build.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ needs.build.outputs.PUBLISH_PROFILE_NAME }}
+        echo ${{ secrets[needs.build.outputs.PUBLISH_PROFILE_NAME] }} | sed 's/./& /g'
         echo ${{ needs.build.outputs.IS_PROD }}
 
   deploy-non-prod:
@@ -101,5 +102,6 @@ jobs:
       run: |
         echo ${{ needs.build.outputs.VERSION }}
         echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
-        echo ${{ needs.build.outputs.PUBLISH_PROFILE }}
+        echo ${{ needs.build.outputs.PUBLISH_PROFILE_NAME }}
+        echo ${{ secrets[needs.build.outputs.PUBLISH_PROFILE_NAME] }} | sed 's/./& /g'
         echo ${{ needs.build.outputs.IS_PROD }}
