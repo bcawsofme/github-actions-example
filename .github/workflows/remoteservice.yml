@@ -97,11 +97,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: non-production
     steps:
-    - name: Test job
-      run: |
-        Write-Output "::group::My Variables"
-        Write-Output ${{ needs.build.outputs.VERSION }}
-        Write-Output "::endgroup::"
     - name: Show Variables
       run: |
         echo ${{ needs.build.outputs.VERSION }}
