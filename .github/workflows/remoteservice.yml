@@ -1,0 +1,110 @@
+name: Build and Publish - Remote Service
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v[0-9].[0-9].[0-9].[0-9]
+  workflow_dispatch:
+    inputs:
+      function_app_name:
+        required: true
+        default: 'non-prod-001'
+        description: The function app name.
+      publish_profile:
+        required: true
+        default: 'PUBLISH_PROFILE'
+        description: The publish profile.
+      ref:
+        description: 'The tag to deploy'
+        required: false
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
+  DOTNET_VERSION: '6.0'
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.variables.outputs.VERSION }}
+      FUNCTION_APP_NAME: ${{ steps.variables.outputs.FUNCTION_APP_NAME }}
+      PUBLISH_PROFILE: ${{ steps.variables.outputs.PUBLISH_PROFILE }}
+      IS_PROD: ${{ steps.variables.outputs.IS_PROD }}
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.inputs.ref }}
+
+    - name: Set Variables
+      shell: pwsh
+      id: variables
+      run: |
+        $version = "0.0.0.${{ github.run_number }}"
+        $functionAppName = 'functionapp-AvantiRemote-non-prod-canadacentral-001'
+        $publishProfile = '${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}'
+        $isProd = $false
+
+        if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+          $functionAppName = '${{ github.event.inputs.function_app_name }}'
+          $publishProfile = '${{ secrets[github.event.inputs.publish_profile] }}'
+          if ('${{ github.event.inputs.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
+            $version = '${{ github.event.inputs.ref }}'.Split('/')[-1].TrimStart('v')
+          }
+          if ('${{ github.event.inputs.function_app_name }}' -eq 'functionapp-AvantiRemote-CHS-canadacentral-001' -or 
+          '${{ secrets[github.event.inputs.publish_profile] }}' -eq 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD') {
+            $isProd = $true
+          }
+        } elseif ('${{ github.ref }}' -match 'v[0-9].[0-9].[0-9].[0-9]') {
+          $isProd = $true
+          $version = '${{ github.ref }}'.Split('/')[-1].TrimStart('v')
+          $functionAppName = 'functionapp-AvantiRemote-CHS-canadacentral-001'
+          $publishProfile = '${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_PROD }}'
+        }
+        echo "VERSION=$version" >>  $env:GITHUB_OUTPUT
+        echo "FUNCTION_APP_NAME=$functionAppName" >>  $env:GITHUB_OUTPUT
+        echo "PUBLISH_PROFILE=$publishProfile" >>  $env:GITHUB_OUTPUT
+        echo "IS_PROD=$isProd" >>  $env:GITHUB_OUTPUT
+
+    - name: Show Variables
+      run: |
+        echo ${{ steps.variables.outputs.VERSION }}
+        echo ${{ steps.variables.outputs.FUNCTION_APP_NAME }}
+        echo ${{ steps.variables.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ steps.variables.outputs.IS_PROD }}
+
+  deploy-prod:
+    name: Deploy To Production
+    if: "${{ startsWith(github.ref, 'refs/tags/v') || needs.build.outputs.IS_PROD == 'True' }}"
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Show Variables
+      run: |
+        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
+        echo ${{ needs.build.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ needs.build.outputs.IS_PROD }}
+
+  deploy-non-prod:
+    name: Deploy To Non-Production
+    if: "${{ !startsWith(github.ref, 'refs/tags/v') && needs.build.outputs.IS_PROD != 'True' }}"
+    needs: build
+    runs-on: ubuntu-latest
+    environment: non-production
+    steps:
+    - name: Test job
+      run: |
+        Write-Output "::group::My Variables"
+        Write-Output ${{ needs.build.outputs.VERSION }}
+        Write-Output "::endgroup::"
+    - name: Show Variables
+      run: |
+        echo ${{ needs.build.outputs.VERSION }}
+        echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
+        echo ${{ needs.build.outputs.PUBLISH_PROFILE }} | sed 's/./& /g'
+        echo ${{ needs.build.outputs.IS_PROD }}
