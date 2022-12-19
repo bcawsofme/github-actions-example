@@ -62,7 +62,7 @@ jobs:
         echo "MINVERSION=$minversion" >>  $env:GITHUB_OUTPUT
         echo "FUNCTION_URL=$functionUrl" >>  $env:GITHUB_OUTPUT
         echo "PUBLISH_URL=$publishUrl" >>  $env:GITHUB_OUTPUT
-
+        
     - name: Show Variables
       run: |
         echo ${{ steps.variables.outputs.VERSION }}
