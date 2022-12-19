@@ -99,11 +99,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: non-production
     env:
+      FUNCTION_APP_NAME: ${{ needs.build.outputs.FUNCTION_APP_NAME }}
       PUBLISH_PROFILE: ${{ secrets[needs.build.outputs.PUBLISH_PROFILE_NAME] }}
     steps:
     - name: Show Variables
       run: |
-        echo ${{ needs.build.outputs.VERSION }}
-        echo ${{ needs.build.outputs.FUNCTION_APP_NAME }}
+        echo ${{ env.FUNCTION_APP_NAME }}
         echo ${{ env.PUBLISH_PROFILE }} | sed 's/./& /g'
         echo ${{ needs.build.outputs.IS_PROD }}
