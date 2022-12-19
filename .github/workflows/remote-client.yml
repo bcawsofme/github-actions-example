@@ -53,7 +53,7 @@ jobs:
         } else {
           $minversion = '${{ secrets.MINVERSION_NONPROD }}'
           $assemblyName = 'Avanti Cloud Client Non-Prod'
-          $version = "0.0.0.$run"
+          $version = '0.0.0.$run'
           $functionUrl = 'https://remoteservice.avantidemo.com/api'
           $publishUrl = 'https://app.avantidemo.com'
         }
