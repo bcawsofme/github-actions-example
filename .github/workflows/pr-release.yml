@@ -6,18 +6,17 @@ on:
       - main
 
 jobs:
-   pull_request:
+  cherry-pick:
+    name: Cherry Pick
     runs-on: ubuntu-latest
-    name: Create Release Pull Request
     steps:
-    - name: checkout
-      uses: actions/checkout@v3
-      
-    - name: Create PR to branch
-      uses: gorillio/github-action-cherry-pick@master
-      with:
-        pr_branch: 'release/cherrypick-${{ github.run_id }}-${{ github.run_number }}'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITBOT_EMAIL:  rlee@avanti.ca
-        DRY_RUN: false
+      - name: Checkout the latest code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          
+      - name: Automatic Cherry Pick
+        uses: vendoo/gha-cherry-pick@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
