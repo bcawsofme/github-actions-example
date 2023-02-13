@@ -1,22 +1,30 @@
 name: PR to Release Branch
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types: ["closed"]
 
 jobs:
-  cherry-pick:
-    name: Cherry Pick
+  cherry_pick_release_v1_0:
     runs-on: ubuntu-latest
+    name: Cherry pick into release-v1.0
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'release-v1.0') && github.event.pull_request.merged == true }}
     steps:
-      - name: Checkout the latest code
+      - name: Checkout
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-          
-      - name: Automatic Cherry Pick
-        uses: vendoo/gha-cherry-pick@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cherry pick into release-v1.0
+        uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+        id: new-issue
+        with:
+          branch: cherrypick/${{ github.run_id }}-${{ github.run_number }}
+          labels: |
+            cherry-pick
+      - run: |
+            echo "${{ steps.new-issue.outputs.data }}"
+            echo "${{ steps.new-issue.outputs.number }}" 
+            echo "${{ steps.new-issue.outputs.html_url }}"
+        
