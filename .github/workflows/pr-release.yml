@@ -1,0 +1,23 @@
+name: PR to Release Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+   pull_request:
+    runs-on: ubuntu-latest
+    name: Create Release Pull Request
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+      
+    - name: Create PR to branch
+      uses: gorillio/github-action-cherry-pick@master
+      with:
+        pr_branch: 'release/cherrypick-${{ github.run_id }}-${{ github.run_number }}'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITBOT_EMAIL:  rlee@avanti.ca
+        DRY_RUN: false
