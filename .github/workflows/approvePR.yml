@@ -13,6 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    if: github.actor == 'dependabot[bot]' || github.actor == 'github-actions[bot]'
+    if: github.actor == 'dependabot[bot]' || github.actor == 'AvantiServiceAccount'
     steps:
       - uses: hmarr/auto-approve-action@v3

@@ -18,20 +18,11 @@ jobs:
           fetch-depth: 0
       - name: Cherry pick
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
-        id: new-issue
         with:
           branch: mt-main
           labels: |
-            cherry-pick   
-            
-  auto-approve:
-    runs-on: ubuntu-latest
-    name: Auto Approve Pull Request
-    permissions:
-      pull-requests: write
-    if: github.actor == 'dependabot[bot]' || github.actor == 'github-actions[bot]'
-    steps:
-      - uses: hmarr/auto-approve-action@v3
+            cherry-pick  
+          author:  AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
             
     
         
