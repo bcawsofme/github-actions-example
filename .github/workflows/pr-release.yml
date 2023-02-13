@@ -20,7 +20,8 @@ jobs:
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         id: new-issue
         with:
-          branch: cherrypick-${{ github.run_number }}-${{ github.run_id }}
+          cherry-pick-branch: cherry-pick-${inputs.branch}-${commitSha}
+          branch: main
           labels: |
             cherry-pick
       - run: |
