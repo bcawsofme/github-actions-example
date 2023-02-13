@@ -1,4 +1,4 @@
-name: Build and Publish - Remote Service - 1
+name: Build and Publish - Remote Service
 
 on:
   push:
