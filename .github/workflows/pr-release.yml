@@ -20,7 +20,7 @@ jobs:
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         id: new-issue
         with:
-          branch: main
+          branch: mt-main
           labels: |
             cherry-pick
       - run: |
