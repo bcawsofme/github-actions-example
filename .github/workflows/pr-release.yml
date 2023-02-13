@@ -21,9 +21,12 @@ jobs:
         with:
           branch: mt-main
           labels: cherry-pick   
-      - run: |
-          echo "${{ steps.new-issue.outputs.data }}"
-          echo "${{ steps.new-issue.outputs.number }}" 
-          echo "${{ steps.new-issue.outputs.html_url }}"
+          author: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
+          committer: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
+
+      - name: Auto Approve Pull Request
+        uses: hmarr/auto-approve-action@v3
+        with:
+          pull-request-number: ${{ steps.new-issue.outputs.number }}
     
         
