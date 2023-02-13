@@ -9,18 +9,18 @@ on:
 jobs:
   cherry_pick_release_v1_0:
     runs-on: ubuntu-latest
-    name: Cherry pick into release-v1.0
+    name: Cherry pick
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Cherry pick into release-v1.0
+      - name: Cherry pick
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         id: new-issue
         with:
-          branch: cherrypick/${{ github.run_id }}-${{ github.run_number }}
+          branch: cherrypick-${{ github.run_number }}-${{ github.run_id }}
           labels: |
             cherry-pick
       - run: |
