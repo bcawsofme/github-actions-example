@@ -1,4 +1,4 @@
-name: Pull Request to Mt-Main
+name: Pull Request to MT-Main
 
 on:
   pull_request:
@@ -24,9 +24,15 @@ jobs:
           author: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
           committer: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
 
-      - name: Auto Approve Pull Request
+      - name: Auto Approve Pull Request - Github Actions User
         uses: hmarr/auto-approve-action@v3
         with:
-          pull-request-number: ${{ steps.new-issue.outputs.number }}
+          pull-request-number: ${{ steps.new-issue.outputs.outputs.data.number }}
+    
+      - name: Auto Approve Pull Request - Avanti Team User
+        uses: hmarr/auto-approve-action@v3
+        with:
+          pull-request-number: ${{ steps.new-issue.outputs.outputs.data.number }}
+          github-token: ${{ secrets.AVANTI_TEAM_USER }}
     
         
