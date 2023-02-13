@@ -20,7 +20,6 @@ jobs:
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         id: new-issue
         with:
-          cherry-pick-branch: cherry-pick-${commitSha}
           branch: main
           labels: |
             cherry-pick
