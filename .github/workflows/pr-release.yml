@@ -8,21 +8,27 @@ on:
 
 jobs:
   cherry_pick:
-    runs-on: ubuntu-latest
-    name: Cherry pick
+    name: Create Pull Request
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Cherry pick
-        uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
-        with:
-          branch: mt-main
-          labels: |
-            cherry-pick  
-          author:  AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
+    - uses: actions/checkout@v3
+
+    - name: Open Pull Request
+      id: open-pr
+      uses: repo-sync/pull-request@v2
+      with:
+        destination_branch: "mt-main"
+        pr_label: "cherry-pick"
+        pr_allow_empty: true
+
+    - name: Auto Approve Pull Request
+      uses: hmarr/auto-approve-action@v3
+      with:
+        pull-request-number: ${{steps.open-pr.outputs.pr_number}}
+
             
     
         
