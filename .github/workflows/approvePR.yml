@@ -1,7 +1,10 @@
 name: Auto approve
 
-on: pull_request_target
-
+on: 
+  issues:
+    types:
+      - opened
+  
 jobs:
   auto-approve:
     runs-on: ubuntu-latest
