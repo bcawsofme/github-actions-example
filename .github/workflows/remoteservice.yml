@@ -1,5 +1,5 @@
 ---
-name: Build and Publish - Remote Service - Test 10
+name: Build and Publish - Remote Service - Testing
 
 on:
   push:
