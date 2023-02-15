@@ -1,9 +1,8 @@
 name: Auto approve
 
 on: 
-  issues:
-    types:
-      - opened
+  create:
+    branches: ['cherry-pick*']   
   
 jobs:
   auto-approve:
