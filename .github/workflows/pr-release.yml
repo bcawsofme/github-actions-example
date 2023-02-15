@@ -23,11 +23,5 @@ jobs:
           labels: cherry-pick   
           author: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
           committer: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
-          #team-reviewers: 'Dev Leaders'
-
-      - name: Auto Approve Pull Request - Github Actions User
-        uses: hmarr/auto-approve-action@v3
-        with:
-          pull-request-number: ${{ steps.new-issue.outputs.outputs.number }}
     
         
