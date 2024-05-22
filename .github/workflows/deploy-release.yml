@@ -26,7 +26,7 @@ env:
 jobs:
   release:
     name: Create Release
-    uses: ./.github/workflows/reusable/build-release.yml
+    uses: ./.github/workflows/build-release.yml
     with:
       ref: ""
       artifact-name: EmployeeSelfService
