@@ -28,4 +28,4 @@ jobs:
           labels: cherry-pick   
           author: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
           committer: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
-          assignees: ${{ env.PR_OWNER }}     
+          assignees: ${{ github.event.pull_request.user.login }}
