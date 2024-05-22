@@ -1,0 +1,41 @@
+# Deploy ASSP to staging slot on Non-Prod App Service.
+name: Deploy ASSP to Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version of the release. ie. 23.8.1
+        required: true
+      ref:
+        description: The branch, tag or SHA to checkout.
+        default: 'mt-main'
+      release:
+        description: Create a release?
+        default: 'true'
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+  packages: read
+
+env:
+  ARTIFACT_NAME: EmployeeSelfService
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' &&  github.event.inputs.release == 'true' }}
+    uses: ./.github/workflows/build-release.yml
+    with:
+      ref: ""
+      artifact-name: EmployeeSelfService
+      current-version: "24.5.1"
+      previous-version: "24.4.1"
+      image-tag: "12344"
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    
