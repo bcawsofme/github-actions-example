@@ -1,0 +1,27 @@
+name: Pull Request to MT-Main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: ["closed"]
+
+jobs:
+  cherry_pick:
+    runs-on: ubuntu-latest
+    name: Create Pull Request
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create Pull Request
+        uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+        with:
+          branch: mt-main
+          labels: cherry-pick-main
+          author: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
+          committer: AvantiServiceAccount <AvantiServiceAccount@users.noreply.github.com>
+          team-reviewers: dev-leaders
+          token: ${{ secrets.AVANTI_SERVICE_ACCOUNT_PAT }}
+          reviewers: ${{ github.event.pull_request.user.login }}
